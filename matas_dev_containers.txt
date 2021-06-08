@@ -9,43 +9,53 @@ docker stop dev-db-ms
 docker rm dev-db-ms
 --
 
-docker run -p 1433:1433 --name dev-db-ms --network is.matas.dk -e ACCEPT_EULA=Y -e SA_PASSWORD=R1o2o3t4 -d mcr.microsoft.com/mssql/server:2019-latest
+docker run -p 1433:1433 --name dev-db-ms-510 --network is.matas.dk -e ACCEPT_EULA=Y -e SA_PASSWORD=R1o2o3t4 -d mcr.microsoft.com/mssql/server:2019-latest
 sleep 5
 
-docker exec dev-db-ms mkdir usr/dbscripts
-docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/mssql.sql dev-db-ms:usr/dbscripts/shared.sql
-docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts//bps/bpel/create/mssql.sql dev-db-ms:usr/dbscripts/bps.sql
-docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/identity/mssql.sql dev-db-ms:usr/dbscripts/identity.sql
-docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/consent/mssql.sql dev-db-ms:usr/dbscripts/consent.sql
+docker exec dev-db-ms-510 mkdir usr/dbscripts
+docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/5.10.0/mssql.sql dev-db-ms-510:usr/dbscripts/shared.sql
+docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/5.10.0/bps/bpel/create/mssql.sql dev-db-ms-510:usr/dbscripts/bps.sql
+docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/5.10.0/identity/mssql.sql dev-db-ms-510:usr/dbscripts/identity.sql
+docker cp ~/work/wso2/matas/git/ansible-is-master/files/dbscripts/5.10.0/consent/mssql.sql dev-db-ms-510:usr/dbscripts/consent.sql
 
 sleep 5
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2SHARED_DB"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2SHARED_DB"
 sleep 2
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2CONSENT_DB"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2CONSENT_DB"
 sleep 2
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2IDENTITY_DB"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2IDENTITY_DB"
 sleep 2
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2BPS_DB"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE WSO2BPS_DB"
 sleep 2
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE MATAS"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE DATABASE MATAS"
 sleep 2
 
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_shared_user WITH PASSWORD='jfewWER#6few'"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_consent_user WITH PASSWORD='jfewWER#6few'"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_identity_user WITH PASSWORD='jfewWER#6few'"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_bps_user WITH PASSWORD='jfewWER#6few'"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_shared_user WITH PASSWORD='jfewWER#6few'"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_consent_user WITH PASSWORD='jfewWER#6few'"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_identity_user WITH PASSWORD='jfewWER#6few'"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "CREATE LOGIN wso2_bps_user WITH PASSWORD='jfewWER#6few'"
 
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2SHARED_DB; CREATE USER wso2_shared_user for LOGIN wso2_shared_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_shared_user; GRANT CONTROL ON DATABASE::WSO2SHARED_DB TO wso2_shared_user;"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE MATAS; CREATE USER wso2_shared_user for LOGIN wso2_shared_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_shared_user; GRANT CONTROL ON DATABASE::MATAS TO wso2_shared_user;"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2CONSENT_DB; CREATE USER wso2_consent_user for LOGIN wso2_consent_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_consent_user; GRANT CONTROL ON DATABASE::WSO2CONSENT_DB TO wso2_consent_user;"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2IDENTITY_DB; CREATE USER wso2_identity_user for LOGIN wso2_identity_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_identity_user; GRANT CONTROL ON DATABASE::WSO2IDENTITY_DB TO wso2_identity_user;"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2BPS_DB; CREATE USER wso2_bps_user for LOGIN wso2_bps_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_bps_user; GRANT CONTROL ON DATABASE::WSO2BPS_DB TO wso2_bps_user;"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2SHARED_DB; CREATE USER wso2_shared_user for LOGIN wso2_shared_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_shared_user; GRANT CONTROL ON DATABASE::WSO2SHARED_DB TO wso2_shared_user;"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE MATAS; CREATE USER wso2_shared_user for LOGIN wso2_shared_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_shared_user; GRANT CONTROL ON DATABASE::MATAS TO wso2_shared_user;"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2CONSENT_DB; CREATE USER wso2_consent_user for LOGIN wso2_consent_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_consent_user; GRANT CONTROL ON DATABASE::WSO2CONSENT_DB TO wso2_consent_user;"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2IDENTITY_DB; CREATE USER wso2_identity_user for LOGIN wso2_identity_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_identity_user; GRANT CONTROL ON DATABASE::WSO2IDENTITY_DB TO wso2_identity_user;"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P R1o2o3t4 -Q "USE WSO2BPS_DB; CREATE USER wso2_bps_user for LOGIN wso2_bps_user; GRANT CONTROL ON SCHEMA::dbo TO wso2_bps_user; GRANT CONTROL ON DATABASE::WSO2BPS_DB TO wso2_bps_user;"
 
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_shared_user -P jfewWER#6few -d WSO2SHARED_DB -i "usr/dbscripts/shared.sql"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_bps_user -P jfewWER#6few -d WSO2BPS_DB -i "usr/dbscripts/bps.sql"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_consent_user -P jfewWER#6few -d WSO2CONSENT_DB -i "usr/dbscripts/consent.sql"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_identity_user -P jfewWER#6few -d WSO2IDENTITY_DB -i "usr/dbscripts/identity.sql"
-docker exec dev-db-ms /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_shared_user -P jfewWER#6few -d MATAS -i "usr/dbscripts/shared.sql"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_shared_user -P jfewWER#6few -d WSO2SHARED_DB -i "usr/dbscripts/shared.sql"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_bps_user -P jfewWER#6few -d WSO2BPS_DB -i "usr/dbscripts/bps.sql"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_consent_user -P jfewWER#6few -d WSO2CONSENT_DB -i "usr/dbscripts/consent.sql"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_identity_user -P jfewWER#6few -d WSO2IDENTITY_DB -i "usr/dbscripts/identity.sql"
+docker exec dev-db-ms-510 /opt/mssql-tools/bin/sqlcmd -S localhost -U wso2_shared_user -P jfewWER#6few -d MATAS -i "usr/dbscripts/shared.sql"
+
+
+
+
+
+
+
+
+
+
 
 ansible-playbook -i inventory/dev site.yml --skip-tags "service_restart,java_install,wso2_install" --limit "is_1" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root" --vault-id ../vault-pw-dev.txt
 
@@ -54,6 +64,9 @@ ansible-playbook -i inventory/dev site.yml --skip-tags "service_restart,java_ins
 ansible-vault view inventory/dev/group_vars/all/secrets.yml --vault-id ../vault-pw-dev.txt
 
 sshpass -p root ssh root@dev-1.is.matas.dk
+
+
+
 
 docker run -p 3306:3306 --name dev-db --network is.matas.dk -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0
 sleep 10
@@ -92,6 +105,10 @@ sleep 3
 docker stop dev-1
 docker rm dev-1
 
+
+
+
+
 #build ubuntu_ssh template: docker build -t ubuntu_ssh
 
 docker run -d --name dev --network is.matas.dk \
@@ -102,9 +119,15 @@ docker run -d --name dev --network is.matas.dk \
 sudo gedit /etc/hosts
 sshpass -p root ssh root@dev.is.matas.dk
 
-ansible-playbook -i inventory/dev site.yml --skip-tags "service_restart" --limit "is_1" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root"
-ansible-playbook -i inventory/dev site.yml --skip-tags "service_restart" --limit "is_1" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root" --vault-password-file ../vault-pw-dev.txt
 
+
+docker run -d -p 9443:9443 --name dev --network is.matas.dk \
+  --ip 172.19.0.3 ubuntu_ssh
+
+
+
+
+keytool -genkey -alias wso2carbon -keyalg RSA -keysize 2048 -keystore dev_wso2carbon.jks -dname "CN=dev.is.matas.dk, OU=IS,O=Matas,L=DK" -ext "SAN=localhost" -storepass wso2carbon -keypass wso2carbon
 keytool -genkey -alias wso2carbon -keyalg RSA -keysize 2048 -keystore dev_wso2carbon.jks -dname "CN=dev.is.matas.dk, OU=IS,O=Matas,L=DK" -storepass wso2carbon -keypass wso2carbon
 keytool -export -alias wso2carbon -keystore dev_wso2carbon.jks -storepass wso2carbon -file dev_wso2carbon.pem
 keytool -import -alias dev -file dev_wso2carbon.pem -keystore client-truststore.jks -storepass wso2carbon
@@ -169,43 +192,3 @@ docker start lb-km-dev
 docker start lb-gw-dev
 docker start lb-ps-dev
 docker start lb-an-dev
-
-gnome-terminal -- /bin/sh -c 'docker exec dev-api02 "mnt/apim-analytics-worker/wso2am-analytics-3.2.0/bin/worker.sh"'
-gnome-terminal -- /bin/sh -c 'docker exec dev-api02 "mnt/apim-analytics-dashboard/wso2am-analytics-3.2.0/wso2/dashboard/bin/carbon.sh"'
-gnome-terminal -- /bin/sh -c 'docker exec dev-api01 "mnt/apim/wso2am-3.2.0/bin/wso2server.sh"'
-
-
-sudo sysctl -w net.ipv4.ip_forward=1
-
-
-
-Remember for Portal Publisher node in deployment.toml
-- - - - - - - - - - - - - - - - -
-[transport.https.properties]
-proxyPort = 443
-
-ansible_apim_jysk
-
-
-
-
-
-docker cp test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/api/admin--Worldbank_v1.0.0.xml ../admin--Worldbank_v1.0.0.xml
-docker cp test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/endpoints/Worldbank--v1.0.0_APIproductionEndpoint.xml ../Worldbank--v1.0.0_APIproductionEndpoint.xml
-docker cp test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/endpoints/Worldbank--v1.0.0_APIsandboxEndpoint.xml ../Worldbank--v1.0.0_APIsandboxEndpoint.xml
-
-docker cp ../admin--Worldbank_v1.0.0.xml test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/api/admin--Worldbank_v1.0.0.xml
-docker cp ../Worldbank--v1.0.0_APIproductionEndpoint.xml test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/endpoints/Worldbank--v1.0.0_APIproductionEndpoint.xml
-docker cp ../Worldbank--v1.0.0_APIsandboxEndpoint.xml test-api05:/mnt/apim-gateway/wso2am-3.2.0/repository/deployment/server/synapse-configs/default/endpoints/Worldbank--v1.0.0_APIsandboxEndpoint.xml
-
-keytool -keystore ~/work/wso2/jysk/apim320/git/ansible-jysk-apim/files/security/wso2am/dev/client-truststore.jks -storepass wso2carbon -import -alias lb-dev -file ~/work/wso2/jysk/apim320/lb-dev.crt -noprompt
-keytool -keystore ~/work/wso2/jysk/apim320/git/ansible-jysk-apim/files/security/wso2am-analytics/dev/client-truststore.jks -storepass wso2carbon -import -alias lb-dev -file ~/work/wso2/jysk/apim320/lb-dev.crt -noprompt
-
-ansible-playbook -i inventory/dev site.yml --limit "ad1" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root" --vault-id ../password-dev.txt
-ansible-playbook -i inventory/dev site.yml --limit "aw1" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root" --vault-id ../password-dev.txt
-ansible-playbook -i inventory/dev site.yml --limit "wso2apim" --extra-vars "ansible_ssh_pass=root ansible_ssh_user=root ansible_sudo_pass=root" --vault-id ../password-dev.txt
-
-
-gnome-terminal -- /bin/sh -c 'docker exec dev-api02 "/data/wso2/aw1/wso2am-analytics-3.2.0/bin/worker.sh"'
-gnome-terminal -- /bin/sh -c 'docker exec dev-api02 "/data/wso2/ad1/wso2am-analytics-3.2.0/wso2/dashboard/bin/carbon.sh"'
-gnome-terminal -- /bin/sh -c 'docker exec dev-api01 "/data/wso2/wso2apim/wso2am-3.2.0/bin/wso2server.sh"'
